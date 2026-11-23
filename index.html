@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Anime - Download Oficial</title>
+    <!-- Carregando Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carregando Fonte Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Carregando Ícones Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Efeito de brilho vermelho intenso no fundo */
+        .bg-glow {
+            background: radial-gradient(circle at 50% 0%, rgba(220, 38, 38, 0.35) 0%, rgba(0, 0, 0, 1) 65%);
+        }
+
+        /* Animação pulsante para o botão de download */
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.85);
+            }
+            50% {
+                box-shadow: 0 0 30px 10px rgba(220, 38, 38, 0.45);
+            }
+        }
+
+        .btn-download-glow {
+            animation: pulse-red 2.2s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-black bg-glow selection:bg-red-600 selection:text-white">
+
+    <!-- Cabeçalho / Navbar -->
+    <header class="w-full border-b border-red-900/40 bg-black/90 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-950 flex items-center justify-center shadow-lg shadow-red-600/40 border border-red-500/40">
+                    <i data-lucide="play" class="w-5 h-5 text-white fill-white ml-0.5"></i>
+                </div>
+                <div>
+                    <span class="text-xl sm:text-2xl font-black tracking-tight text-white">MEGA <span class="text-red-600">ANIME</span></span>
+                    <span class="block text-[10px] uppercase tracking-widest text-red-500 font-bold">Site Oficial</span>
+                </div>
+            </div>
+
+            <!-- Botão Discord no Topo (Tema Preto e Vermelho) -->
+            <a href="https://discord.gg/Fj2pGvy9gY" target="_blank" rel="noopener noreferrer" 
+               class="flex items-center gap-2 bg-zinc-950 hover:bg-red-950/50 text-white border border-red-800/60 hover:border-red-500 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm shadow-red-950/30">
+                <!-- Ícone SVG do Discord em Vermelho -->
+                <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                <span class="hidden sm:inline">Servidor Discord</span>
+                <span class="sm:hidden">Discord</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 flex-grow w-full">
+
+        <!-- Hero Section -->
+        <section class="text-center mb-14">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-950/60 border border-red-500/30 text-red-400 text-xs sm:text-sm font-semibold mb-6">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                Versão Disponível • Download Oficial
+            </div>
+            
+            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white mb-5 leading-tight">
+                Bem-vindo ao <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-700">Mega Anime</span>
+            </h1>
+            
+            <p class="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                Siga atentamente o guia abaixo para baixar, instalar e configurar o aplicativo corretamente no seu dispositivo Android sem nenhum erro.
+            </p>
+        </section>
+
+        <!-- Guia Passo a Passo Completo -->
+        <section class="space-y-8 mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="h-8 w-1.5 bg-red-600 rounded-full"></div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Passo a Passo de Instalação</h2>
+            </div>
+
+            <!-- PASSO 1 -->
+            <div class="bg-zinc-950 border border-red-900/40 hover:border-red-600/80 rounded-2xl p-6 sm:p-8 transition-all duration-300 shadow-xl shadow-red-950/10">
+                <div class="flex items-start gap-4 sm:gap-5">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-red-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-lg shadow-red-600/40">
+                        1
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            Baixe o App pelo Site Oficial
+                            <span class="text-xs bg-red-950/70 text-red-400 px-2.5 py-0.5 rounded-md border border-red-800/50">Seguro</span>
+                        </h3>
+                        <p class="text-zinc-300 leading-relaxed text-sm sm:text-base">
+                            Role até o final desta página e clique no botão vermelho de download para baixar o instalador (<code class="text-red-400 bg-red-950/50 px-1.5 py-0.5 rounded border border-red-900/40">MegaAnime.apk</code>) diretamente por este <strong class="text-white">site oficial</strong>. Evite baixar de links de terceiros para garantir a versão mais recente da demo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 2 -->
+            <div class="bg-zinc-950 border border-red-900/40 hover:border-red-600/80 rounded-2xl p-6 sm:p-8 transition-all duration-300 shadow-xl shadow-red-950/10">
+                <div class="flex items-start gap-4 sm:gap-5">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-red-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-lg shadow-red-600/40">
+                        2
+                    </div>
+                    <div class="space-y-3 w-full">
+                        <h3 class="text-xl font-bold text-white">Instale o Aplicativo no Celular</h3>
+                        <p class="text-zinc-300 leading-relaxed text-sm sm:text-base">
+                            Após concluir o download, abra o arquivo baixado para iniciar a instalação. Se o navegador pedir permissão para <em>"Instalar apps desconhecidos"</em>, basta ativar a opção.
+                        </p>
+                        <!-- Caixa de Dica sobre Versão Anterior -->
+                        <div class="bg-black border-l-4 border-red-600 border-y border-r border-red-950/60 rounded-r-xl p-4 flex items-start gap-3">
+                            <i data-lucide="refresh-cw" class="w-5 h-5 text-red-500 shrink-0 mt-0.5"></i>
+                            <div class="text-sm text-zinc-300">
+                                <strong class="text-white block mb-1">Já tinha uma versão anterior instalada?</strong>
+                                Você pode <strong class="text-red-400">instalar por cima</strong> normalmente para atualizar! Caso dê algum erro durante a instalação, basta <strong class="text-white">apagar (desinstalar) a versão antiga</strong> e instalar esta versão atual do zero.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 3 (Com Mockup do Aviso Google Play Protect) -->
+            <div class="bg-zinc-950 border border-red-900/40 hover:border-red-600/80 rounded-2xl p-6 sm:p-8 transition-all duration-300 shadow-xl shadow-red-950/10">
+                <div class="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
+                    <div class="flex items-start gap-4 sm:gap-5 flex-1">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-red-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-lg shadow-red-600/40">
+                            3
+                        </div>
+                        <div class="space-y-3">
+                            <h3 class="text-xl font-bold text-white">Aviso do Google Play Protect</h3>
+                            <p class="text-zinc-300 leading-relaxed text-sm sm:text-base">
+                                Durante a instalação, pode aparecer uma tela parecida com esta ao lado dizendo <strong class="text-white">"App scan recommended"</strong> (Verificação de app recomendada) ou bloqueando a instalação inicialmente.
+                            </p>
+                            <div class="bg-red-950/35 border border-red-700/50 rounded-xl p-4 space-y-2">
+                                <div class="flex items-center gap-2 text-red-400 font-bold text-sm">
+                                    <i data-lucide="shield-check" class="w-5 h-5 text-red-500"></i>
+                                    Pode continuar sem medo!
+                                </div>
+                                <p class="text-zinc-300 text-sm leading-relaxed">
+                                    Esse é apenas um aviso padrão do Android porque o app ainda não foi publicado/verificado na Google Play Store. Basta clicar em <strong class="text-white">"More details" (Mais detalhes)</strong> e selecionar <strong class="text-white">"Install anyway" (Instalar mesmo assim)</strong> ou <strong class="text-white">"Scan app" (Verificar app)</strong> para prosseguir.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mockup Visual fiel à imagem enviada -->
+                    <div class="w-full max-w-[270px] mx-auto lg:mx-0 shrink-0 select-none">
+                        <div class="bg-[#f5f6ee] text-[#1f1f1f] rounded-[24px] p-5 shadow-2xl border-4 border-zinc-800 relative">
+                            <!-- Cabeçalho Play Protect -->
+                            <div class="flex items-center justify-center gap-1.5 text-[11px] font-medium text-[#5f6368] mb-3">
+                                <svg class="w-3.5 h-3.5 text-[#5f6368]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    <polygon points="10 8 15 12 10 16 10 8" fill="currentColor" stroke="none"/>
+                                </svg>
+                                Google Play Protect
+                            </div>
+
+                            <!-- Título -->
+                            <div class="text-center font-semibold text-base text-[#1f1f1f] mb-3.5 leading-snug">
+                                App scan recommended
+                            </div>
+
+                            <!-- Card do App -->
+                            <div class="bg-[#eaebe3] rounded-2xl p-2.5 flex items-center gap-3 mb-3.5">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-red-600 to-rose-400 flex items-center justify-center text-white font-black text-xs shadow-sm">
+                                    MA
+                                </div>
+                                <span class="font-medium text-sm text-[#1f1f1f]">Mega Anime</span>
+                            </div>
+
+                            <!-- Texto explicativo do Android -->
+                            <p class="text-[11px] text-center text-[#444746] leading-relaxed mb-3">
+                                Play Protect hasn't seen this app before. To protect your device and data, send some info about the app to Google for scanning before you install.
+                            </p>
+
+                            <!-- More details -->
+                            <div class="text-center text-[11px] font-medium text-[#444746] mb-3.5 flex items-center justify-center gap-1">
+                                More details
+                                <span class="text-[9px]">▼</span>
+                            </div>
+
+                            <!-- Botões estilo Android Material You -->
+                            <div class="space-y-2">
+                                <div class="w-full py-2 rounded-full bg-[#dce89e] text-[#1d2305] text-center text-xs font-semibold">
+                                    Scan app
+                                </div>
+                                <div class="w-full py-2 rounded-full bg-[#e4e9c8] text-[#1d2305] text-center text-xs font-medium opacity-75">
+                                    Don't install app
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-center text-[11px] text-zinc-500 mt-2">Exemplo do aviso no Android</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 4 -->
+            <div class="bg-zinc-950 border border-red-900/40 hover:border-red-600/80 rounded-2xl p-6 sm:p-8 transition-all duration-300 shadow-xl shadow-red-950/10">
+                <div class="flex items-start gap-4 sm:gap-5">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-red-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shrink-0 shadow-lg shadow-red-600/40">
+                        4
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-white">Conceda as Permissões e Aproveite a Demo!</h3>
+                        <p class="text-zinc-300 leading-relaxed text-sm sm:text-base">
+                            Ao abrir o <strong class="text-white">Mega Anime</strong> pela primeira vez, <strong class="text-red-400">aceite todas as permissões</strong> que o aplicativo pedir (como armazenamento, notificações ou sobreposição, se solicitado) para que tudo funcione perfeitamente. Depois disso, é só <strong class="text-white">aproveitar a demo</strong>!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Comunidade Discord (100% Preto e Vermelho) -->
+        <section class="mb-14">
+            <div class="bg-gradient-to-r from-black via-zinc-950 to-red-950/40 border border-red-900/50 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl shadow-red-950/10">
+                <div class="flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
+                    <div class="w-14 h-14 rounded-2xl bg-red-600/15 border border-red-600/40 flex items-center justify-center shrink-0">
+                        <svg class="w-8 h-8 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white">Precisa de ajuda ou quer dar feedback?</h3>
+                        <p class="text-zinc-400 text-sm mt-1">Entre no nosso servidor oficial do Discord para suporte, novidades e atualizações do Mega Anime.</p>
+                    </div>
+                </div>
+                <a href="https://discord.gg/Fj2pGvy9gY" target="_blank" rel="noopener noreferrer"
+                   class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-zinc-900 hover:bg-red-600 text-white border border-red-600/60 hover:border-red-500 font-bold text-sm transition-all duration-200 shadow-lg shadow-red-950/30 shrink-0">
+                    Entrar no Discord
+                </a>
+            </div>
+        </section>
+
+        <!-- Seção Final: Botão Vermelho de Download -->
+        <section id="download-section" class="text-center bg-gradient-to-b from-zinc-950 to-black border border-red-700/60 rounded-3xl p-8 sm:p-12 shadow-2xl shadow-red-950/20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-red-600/10 pointer-events-none"></div>
+            
+            <h2 class="text-2xl sm:text-4xl font-black text-white mb-3 relative z-10">
+                Pronto para começar?
+            </h2>
+            <p class="text-zinc-400 text-sm sm:text-base mb-8 max-w-lg mx-auto relative z-10">
+                Clique no botão abaixo para baixar a versão oficial mais recente da Demo do <strong class="text-white">Mega Anime</strong>.
+            </p>
+
+            <!-- Botão Vermelho de Download -->
+            <div class="relative z-10 flex flex-col items-center">
+                <button id="downloadBtn" onclick="triggerDownload()"
+                        class="btn-download-glow group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 active:scale-95 text-white font-black text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-5 rounded-2xl transition-all duration-200 cursor-pointer border border-red-400/30 w-full sm:w-auto">
+                    <i data-lucide="download" class="w-6 h-6 group-hover:translate-y-0.5 transition-transform"></i>
+                    <span>BAIXAR MEGA ANIME (DEMO)</span>
+                </button>
+
+                <!-- Informações técnicas do arquivo -->
+                <div class="flex flex-wrap items-center justify-center gap-4 mt-5 text-xs text-zinc-500 font-medium">
+                    <span class="flex items-center gap-1"><i data-lucide="smartphone" class="w-3.5 h-3.5 text-red-500"></i> Android APK</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-red-500"></i> Download Oficial</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-red-500"></i> Acesso Gratuito</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Notificação Toast Customizada (Substitui alert()) -->
+    <div id="downloadToast" class="fixed bottom-5 right-5 left-5 sm:left-auto sm:w-96 bg-zinc-900 border border-red-600/60 text-white p-4 rounded-2xl shadow-2xl transform translate-y-32 opacity-0 transition-all duration-300 z-50 flex items-start gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-red-600/20 border border-red-500/30 flex items-center justify-center shrink-0 text-red-500">
+            <i data-lucide="download-cloud" class="w-5 h-5 animate-bounce"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-bold text-sm text-white">Iniciando Download Oficial...</h4>
+            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
+                Seu arquivo <strong>MegaAnime_Demo.apk</strong> está sendo preparado. Lembre-se de seguir os passos 2, 3 e 4 após baixar!
+            </p>
+        </div>
+        <button onclick="closeToast()" class="text-zinc-500 hover:text-white p-1">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="border-t border-red-950/60 bg-black py-8 mt-12">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-red-500">MEGA ANIME</span>
+                <span>© 2026 • Todos os direitos reservados.</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="https://discord.gg/Fj2pGvy9gY" target="_blank" rel="noopener noreferrer" class="hover:text-red-500 transition-colors">
+                    Servidor Oficial Discord
+                </a>
+                <a href="#download-section" class="hover:text-red-500 transition-colors">
+                    Baixar APK
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts de Interatividade -->
+    <script>
+        // Inicializa os ícones Lucide
+        lucide.createIcons();
+
+        let toastTimeout;
+
+        // Função acionada ao clicar no botão de download
+        function triggerDownload() {
+            const btn = document.getElementById('downloadBtn');
+            const originalHTML = btn.innerHTML;
+
+            // Feedback visual imediato no botão
+            btn.innerHTML = `
+                <i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>
+                <span>INICIANDO DOWNLOAD...</span>
+            `;
+            lucide.createIcons();
+
+            // Exibe a notificação amigável na tela
+            showToast();
+
+            // OBS: Substitua a URL abaixo pelo link direto do seu arquivo .apk hospedado (ex: MediaFire, GitHub Releases, Drive, etc.)
+            const apkDownloadUrl = "#link-do-seu-apk-aqui";
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                lucide.createIcons();
+
+                // Se você já tiver colocado o link real do APK na variável acima, ele abrirá automaticamente:
+                if (apkDownloadUrl !== "#link-do-seu-apk-aqui") {
+                    window.location.href = apkDownloadUrl;
+                }
+            }, 1500);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('downloadToast');
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                closeToast();
+            }, 7000);
+        }
+
+        function closeToast() {
+            const toast = document.getElementById('downloadToast');
+            toast.classList.add('translate-y-32', 'opacity-0');
+        }
+    </script>
+</body>
+</html>
