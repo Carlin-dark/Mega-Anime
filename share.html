@@ -20,7 +20,10 @@
   .poster { width:150px; aspect-ratio:2/3; margin:0 auto 18px; border-radius:14px; overflow:hidden; background:var(--card); border:1px solid #23232c; }
   .poster img { width:100%; height:100%; object-fit:cover; display:block; }
   h1 { font-size:19px; line-height:1.3; margin:0 0 8px; }
-  .sub { color:var(--mut); font-size:13px; margin:0 0 24px; }
+  .sub { color:var(--mut); font-size:13px; margin:0 0 10px; }
+  .meta { color:#cbd5e1; font-size:12px; margin:0 0 12px; min-height:16px; }
+  .synopsis { color:var(--mut); font-size:12px; line-height:1.45; margin:0 0 20px;
+    display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
   .btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px;
     border:0; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer; text-decoration:none; }
   .btn.primary { background:var(--red); color:#fff; margin-bottom:10px; }
@@ -36,15 +39,16 @@
   <div class="poster" id="poster"></div>
   <h1 id="title">Abrindo…</h1>
   <p class="sub" id="sub">Um amigo te mandou um anime. Escolha como assistir.</p>
+  <div class="meta" id="meta"></div>
+  <p class="synopsis" id="synopsis"></p>
   <div class="status" id="status"></div>
   <button class="btn primary" id="open">Abrir no app</button>
   <a class="btn ghost" id="site" href="https://carlin-dark.github.io/Mega-Anime/">Abrir no site</a>
-  <a class="btn ghost" id="apk" href="https://carlin-dark.github.io/Mega-Anime/">Baixar o app</a>
+  <a class="btn ghost" id="apk" href="https://carlin-dark.github.io/Mega-Anime/#download-section">Baixar o app</a>
   <p class="hint">Se o app não abrir em alguns segundos, use “Baixar o app” ou “Abrir no site”.</p>
 </div>
 <script>
 (function () {
-  const API = 'https://mega-la8q.onrender.com';
   const SITE = 'https://carlin-dark.github.io/Mega-Anime/';
   const PKG = 'com.megaanime.app';
   const q = new URLSearchParams(location.search);
@@ -55,7 +59,11 @@
   const audio = q.get('audio') || '';
 
   const $ = (s) => document.querySelector(s);
-  const pretty = (s) => decodeURIComponent(String(s || '')).replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const pretty = (s) => decodeURIComponent(String(s || ''))
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b(dublado|legendado|dual\s*audio|hd|fhd|ova|special)\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   if (!slug) {
     $('#title').textContent = 'Link incompleto';
@@ -64,22 +72,70 @@
     return;
   }
 
-  $('#title').textContent = pretty(slug);
+  const fallbackTitle = pretty(slug) || slug;
+  $('#title').textContent = fallbackTitle;
+  $('#sub').textContent = `Um amigo te mandou ${fallbackTitle}. Escolha como assistir.`;
 
-  /* título e capa (sem bloquear a abertura do app) */
-  fetch(`${API}/api/anime/${encodeURIComponent(slug)}?source=${encodeURIComponent(source)}&_t=${Date.now()}`)
-    .then((r) => r.json())
-    .then((d) => {
-      if (!d || d.error) return;
-      if (d.title) {
-        $('#title').textContent = d.title;
-        $('#sub').textContent = `Um amigo te mandou ${d.title}. Escolha como assistir.`;
-        document.title = d.title + ' — MEGA ANIME';
+  /* Busca capa, título e informações via API do Jikan (sem bloquear a abertura do app) */
+  async function carregarJikan(queryTerm) {
+    if (!queryTerm) return;
+    try {
+      const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(queryTerm)}&limit=5&sfw=true`;
+      const resp = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!resp.ok) return;
+
+      const json = await resp.json();
+      const lista = Array.isArray(json?.data) ? json.data : [];
+      if (!lista.length) return;
+
+      const lowerQ = queryTerm.toLowerCase();
+      const anime =
+        lista.find((item) =>
+          String(item?.title || '').toLowerCase() === lowerQ ||
+          String(item?.title_english || '').toLowerCase() === lowerQ
+        ) || lista[0];
+
+      const tituloAnime = anime.title || fallbackTitle;
+      const capaAnime =
+        anime.images?.jpg?.large_image_url ||
+        anime.images?.webp?.large_image_url ||
+        anime.images?.jpg?.image_url ||
+        '';
+
+      $('#title').textContent = tituloAnime;
+      $('#sub').textContent = `Um amigo te mandou ${tituloAnime}. Escolha como assistir.`;
+      document.title = `${tituloAnime} — MEGA ANIME`;
+
+      if (capaAnime) {
+        const img = document.createElement('img');
+        img.referrerPolicy = 'no-referrer';
+        img.alt = `Capa de ${tituloAnime}`;
+        img.src = capaAnime;
+        $('#poster').innerHTML = '';
+        $('#poster').appendChild(img);
       }
-      const cover = d.cover || d.poster;
-      if (cover) $('#poster').innerHTML = `<img src="${API}/img?u=${encodeURIComponent(cover)}" alt="">`;
-    })
-    .catch(() => {});
+
+      const partesMeta = [];
+      const ano = anime.year || anime.aired?.prop?.from?.year;
+      if (ano) partesMeta.push(String(ano));
+      if (anime.episodes) partesMeta.push(`${anime.episodes} eps`);
+      if (anime.score) partesMeta.push(`★ ${anime.score}`);
+      if (season) partesMeta.push(`Temp. ${season}`);
+      if (ep) partesMeta.push(`Ep. ${ep}`);
+      if (audio) partesMeta.push(audio.toUpperCase());
+      $('#meta').textContent = partesMeta.join(' • ');
+
+      if (anime.synopsis) {
+        $('#synopsis').textContent = anime.synopsis
+          .replace(/\[Written by MAL Rewrite\]/gi, '')
+          .trim();
+      }
+    } catch (_) {
+      // Falha silenciosa para não atrapalhar a abertura do app ou site
+    }
+  }
+
+  carregarJikan(fallbackTitle);
 
   const params = (function () {
     const p = new URLSearchParams();
