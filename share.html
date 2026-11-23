@@ -45,7 +45,7 @@
   <button class="btn primary" id="open" type="button">Abrir no app</button>
   <a class="btn ghost" id="site" href="https://carlin-dark.github.io/Mega-Anime/">Abrir no site</a>
   <a class="btn ghost" id="apk" href="https://carlin-dark.github.io/Mega-Anime/#download-section">Baixar o app</a>
-  <p class="hint">Clique em “Abrir no app” para abrir no aplicativo. Se não tiver o app instalado, você será levado para baixar o APK.</p>
+  <p class="hint">Clique em “Abrir no app” para abrir no aplicativo. Se o app não abrir, use “Baixar o app” ou “Abrir no site”.</p>
 </div>
 <script>
 (function () {
@@ -206,8 +206,10 @@
     return p.toString();
   })();
 
-  const intentUrl = `intent://${ep ? 'player' : 'detail'}?${params}#Intent;scheme=megaanime;package=${PKG};S.browser_fallback_url=${encodeURIComponent(DOWNLOAD_URL)};end`;
-  const appUrl = `megaanime://${ep ? 'player' : 'detail'}?${params}`;
+  const route = ep ? 'player' : 'detail';
+  const appUrl = `megaanime://${route}?${params}`;
+  // Sem S.browser_fallback_url forçando download imediato caso o app esteja instalado mas o intent precise de appUrl
+  const intentUrl = `intent://${route}?${params}#Intent;scheme=megaanime;package=${PKG};end`;
 
   const leave = () => {
     left = true;
@@ -226,17 +228,28 @@
     cancelarFallback();
 
     $('#status').textContent = 'Abrindo o MEGA ANIME…';
+
+    // Em Android, tenta intent:// e, se não sair da página em ~900ms, tenta megaanime:// direto
+    const isAndroid = /android/i.test(navigator.userAgent);
     try {
-      location.href = intentUrl;
+      location.href = isAndroid ? intentUrl : appUrl;
     } catch {
       location.href = appUrl;
     }
 
+    if (isAndroid) {
+      setTimeout(() => {
+        if (left || document.hidden) return;
+        try { location.href = appUrl; } catch (_) {}
+      }, 900);
+    }
+
     fallbackTimer = setTimeout(() => {
       if (left || document.hidden) return;
-      $('#status').textContent = 'App não encontrado. Indo para o download…';
-      location.href = DOWNLOAD_URL;
-    }, 1500);
+      $('#status').textContent = 'Não foi possível abrir o app automaticamente. Se não tiver instalado, clique em “Baixar o app”.';
+      // Se quiser redirecionar direto para download ao falhar, descomente a linha abaixo:
+      // location.href = DOWNLOAD_URL;
+    }, 3000);
   };
 
   $('#open').addEventListener('click', openApp);
@@ -244,13 +257,9 @@
   const siteUrl = `${SITE}?source=${encodeURIComponent(source)}&slug=${encodeURIComponent(slug)}`;
   const siteBtn = $('#site');
   siteBtn.href = siteUrl;
-  siteBtn.addEventListener('click', () => {
-    leave();
-  });
+  siteBtn.addEventListener('click', leave);
 
-  $('#apk').addEventListener('click', () => {
-    leave();
-  });
+  $('#apk').addEventListener('click', leave);
 
   resetarEstadoTela();
   if (autoTry && /android/i.test(navigator.userAgent)) {
