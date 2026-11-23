@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0b10">
-<title>MEGA ANIME — Abrindo…</title>
+<title>MEGA ANIME — Compartilhar</title>
 <style>
   :root { --red:#e11d2e; --bg:#0b0b10; --card:#15151c; --txt:#f3f4f6; --mut:#9aa0aa; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -37,15 +37,15 @@
 <div class="wrap">
   <div class="logo"><i><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></i><span>MEGA <b>ANIME</b></span></div>
   <div class="poster" id="poster">Carregando capa…</div>
-  <h1 id="title">Abrindo…</h1>
+  <h1 id="title">Carregando…</h1>
   <p class="sub" id="sub">Um amigo te mandou um anime. Escolha como assistir.</p>
   <div class="meta" id="meta"></div>
   <p class="synopsis" id="synopsis"></p>
   <div class="status" id="status"></div>
-  <button class="btn primary" id="open">Abrir no app</button>
+  <button class="btn primary" id="open" type="button">Abrir no app</button>
   <a class="btn ghost" id="site" href="https://carlin-dark.github.io/Mega-Anime/">Abrir no site</a>
   <a class="btn ghost" id="apk" href="https://carlin-dark.github.io/Mega-Anime/#download-section">Baixar o app</a>
-  <p class="hint">Se o app não abrir em alguns segundos, você será levado para baixar o app ou poderá abrir no site.</p>
+  <p class="hint">Clique em “Abrir no app” para abrir no aplicativo. Se não tiver o app instalado, você será levado para baixar o APK.</p>
 </div>
 <script>
 (function () {
@@ -58,6 +58,7 @@
   const season = q.get('season') || '';
   const ep = q.get('ep') || '';
   const audio = q.get('audio') || '';
+  const autoTry = q.get('auto') === '1';
 
   const $ = (s) => document.querySelector(s);
   const pretty = (s) => decodeURIComponent(String(s || ''))
@@ -66,10 +67,26 @@
     .replace(/\s+/g, ' ')
     .trim();
 
+  let left = false;
+  let fallbackTimer = null;
+
+  function cancelarFallback() {
+    if (fallbackTimer !== null) {
+      clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+    }
+  }
+
+  function resetarEstadoTela() {
+    left = false;
+    cancelarFallback();
+    $('#status').textContent = '';
+  }
+
   if (!slug) {
     $('#title').textContent = 'Link incompleto';
-    $('#sub').textContent = 'Faltou o anime neste link. Redirecionando…';
-    setTimeout(() => location.replace(DOWNLOAD_URL), 1200);
+    $('#sub').textContent = 'Faltou o anime neste link. Redirecionando para o site…';
+    setTimeout(() => location.replace(SITE), 1200);
     return;
   }
 
@@ -97,7 +114,6 @@
         return;
       }
       const atual = fila[idx++];
-      // Na primeira tentativa usa no-referrer; se falhar, tenta sem restringir referrer
       img.referrerPolicy = idx === 1 ? 'no-referrer' : 'strict-origin-when-cross-origin';
       img.src = atual;
     };
@@ -193,27 +209,28 @@
   const intentUrl = `intent://${ep ? 'player' : 'detail'}?${params}#Intent;scheme=megaanime;package=${PKG};S.browser_fallback_url=${encodeURIComponent(DOWNLOAD_URL)};end`;
   const appUrl = `megaanime://${ep ? 'player' : 'detail'}?${params}`;
 
-  let left = false;
-  let fallbackTimer = null;
-
   const leave = () => {
     left = true;
-    if (fallbackTimer) {
-      clearTimeout(fallbackTimer);
-      fallbackTimer = null;
-    }
+    cancelarFallback();
   };
 
-  document.addEventListener('visibilitychange', () => { if (document.hidden) leave(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) leave();
+  });
   window.addEventListener('blur', leave);
   window.addEventListener('pagehide', leave);
+  window.addEventListener('pageshow', resetarEstadoTela);
 
   const openApp = () => {
     left = false;
-    if (fallbackTimer) clearTimeout(fallbackTimer);
+    cancelarFallback();
 
     $('#status').textContent = 'Abrindo o MEGA ANIME…';
-    try { location.href = intentUrl; } catch { location.href = appUrl; }
+    try {
+      location.href = intentUrl;
+    } catch {
+      location.href = appUrl;
+    }
 
     fallbackTimer = setTimeout(() => {
       if (left || document.hidden) return;
@@ -223,9 +240,22 @@
   };
 
   $('#open').addEventListener('click', openApp);
-  $('#site').href = `${SITE}?source=${encodeURIComponent(source)}&slug=${encodeURIComponent(slug)}`;
 
-  if (/android/i.test(navigator.userAgent)) setTimeout(openApp, 250);
+  const siteUrl = `${SITE}?source=${encodeURIComponent(source)}&slug=${encodeURIComponent(slug)}`;
+  const siteBtn = $('#site');
+  siteBtn.href = siteUrl;
+  siteBtn.addEventListener('click', () => {
+    leave();
+  });
+
+  $('#apk').addEventListener('click', () => {
+    leave();
+  });
+
+  resetarEstadoTela();
+  if (autoTry && /android/i.test(navigator.userAgent)) {
+    setTimeout(openApp, 250);
+  }
 })();
 </script>
 </body>
