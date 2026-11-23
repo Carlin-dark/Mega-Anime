@@ -17,7 +17,7 @@
   .logo i svg { width:16px; height:16px; fill:#fff; }
   .logo span { font-size:19px; }
   .logo b { color:var(--red); }
-  .poster { width:150px; aspect-ratio:2/3; margin:0 auto 18px; border-radius:14px; overflow:hidden; background:var(--card); border:1px solid #23232c; }
+  .poster { width:150px; aspect-ratio:2/3; margin:0 auto 18px; border-radius:14px; overflow:hidden; background:var(--card); border:1px solid #23232c; display:flex; align-items:center; justify-content:center; color:var(--mut); font-size:12px; }
   .poster img { width:100%; height:100%; object-fit:cover; display:block; }
   h1 { font-size:19px; line-height:1.3; margin:0 0 8px; }
   .sub { color:var(--mut); font-size:13px; margin:0 0 10px; }
@@ -36,7 +36,7 @@
 <body>
 <div class="wrap">
   <div class="logo"><i><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></i><span>MEGA <b>ANIME</b></span></div>
-  <div class="poster" id="poster"></div>
+  <div class="poster" id="poster">Carregando capa…</div>
   <h1 id="title">Abrindo…</h1>
   <p class="sub" id="sub">Um amigo te mandou um anime. Escolha como assistir.</p>
   <div class="meta" id="meta"></div>
@@ -45,11 +45,12 @@
   <button class="btn primary" id="open">Abrir no app</button>
   <a class="btn ghost" id="site" href="https://carlin-dark.github.io/Mega-Anime/">Abrir no site</a>
   <a class="btn ghost" id="apk" href="https://carlin-dark.github.io/Mega-Anime/#download-section">Baixar o app</a>
-  <p class="hint">Se o app não abrir em alguns segundos, use “Baixar o app” ou “Abrir no site”.</p>
+  <p class="hint">Se o app não abrir em alguns segundos, você será levado para baixar o app ou poderá abrir no site.</p>
 </div>
 <script>
 (function () {
   const SITE = 'https://carlin-dark.github.io/Mega-Anime/';
+  const DOWNLOAD_URL = 'https://carlin-dark.github.io/Mega-Anime/#download-section';
   const PKG = 'com.megaanime.app';
   const q = new URLSearchParams(location.search);
   const source = q.get('source') || 'animesonlinecc';
@@ -67,8 +68,8 @@
 
   if (!slug) {
     $('#title').textContent = 'Link incompleto';
-    $('#sub').textContent = 'Faltou o anime neste link. Abrindo o site…';
-    setTimeout(() => location.replace(SITE), 1200);
+    $('#sub').textContent = 'Faltou o anime neste link. Redirecionando…';
+    setTimeout(() => location.replace(DOWNLOAD_URL), 1200);
     return;
   }
 
@@ -76,44 +77,86 @@
   $('#title').textContent = fallbackTitle;
   $('#sub').textContent = `Um amigo te mandou ${fallbackTitle}. Escolha como assistir.`;
 
-  /* Busca capa, título e informações via API do Jikan (sem bloquear a abertura do app) */
-  async function carregarJikan(queryTerm) {
-    if (!queryTerm) return;
+  function setPosterUrl(url, tituloAnime, candidatosFallback = []) {
+    const posterEl = $('#poster');
+    if (!url) {
+      posterEl.textContent = 'Sem capa';
+      return;
+    }
+
+    const fila = [url, ...candidatosFallback].filter(Boolean);
+    let idx = 0;
+
+    const img = document.createElement('img');
+    img.alt = `Capa de ${tituloAnime}`;
+    img.decoding = 'async';
+
+    const tentarProxima = () => {
+      if (idx >= fila.length) {
+        posterEl.textContent = 'Sem capa';
+        return;
+      }
+      const atual = fila[idx++];
+      // Na primeira tentativa usa no-referrer; se falhar, tenta sem restringir referrer
+      img.referrerPolicy = idx === 1 ? 'no-referrer' : 'strict-origin-when-cross-origin';
+      img.src = atual;
+    };
+
+    img.onerror = tentarProxima;
+    img.onload = () => {
+      posterEl.innerHTML = '';
+      posterEl.appendChild(img);
+    };
+
+    tentarProxima();
+  }
+
+  async function consultarJikanTermo(termo) {
+    if (!termo) return null;
+    const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(termo)}&limit=5`;
+    const resp = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!resp.ok) return null;
+
+    const json = await resp.json();
+    const lista = Array.isArray(json?.data) ? json.data : [];
+    if (!lista.length) return null;
+
+    const lowerQ = termo.toLowerCase();
+    return (
+      lista.find((item) =>
+        String(item?.title || '').toLowerCase() === lowerQ ||
+        String(item?.title_english || '').toLowerCase() === lowerQ
+      ) || lista[0]
+    );
+  }
+
+  async function carregarJikan(termoLimpo, slugBruto) {
     try {
-      const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(queryTerm)}&limit=5&sfw=true`;
-      const resp = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!resp.ok) return;
-
-      const json = await resp.json();
-      const lista = Array.isArray(json?.data) ? json.data : [];
-      if (!lista.length) return;
-
-      const lowerQ = queryTerm.toLowerCase();
-      const anime =
-        lista.find((item) =>
-          String(item?.title || '').toLowerCase() === lowerQ ||
-          String(item?.title_english || '').toLowerCase() === lowerQ
-        ) || lista[0];
+      let anime = await consultarJikanTermo(termoLimpo);
+      const brutoLimpo = decodeURIComponent(String(slugBruto || '')).replace(/[-_]+/g, ' ').trim();
+      if (!anime && brutoLimpo && brutoLimpo.toLowerCase() !== termoLimpo.toLowerCase()) {
+        anime = await consultarJikanTermo(brutoLimpo);
+      }
+      if (!anime) {
+        $('#poster').textContent = 'Sem capa';
+        return;
+      }
 
       const tituloAnime = anime.title || fallbackTitle;
-      const capaAnime =
-        anime.images?.jpg?.large_image_url ||
-        anime.images?.webp?.large_image_url ||
-        anime.images?.jpg?.image_url ||
-        '';
+      const jpgGrande = anime.images?.jpg?.large_image_url || '';
+      const jpgNormal = anime.images?.jpg?.image_url || '';
+      const webpGrande = anime.images?.webp?.large_image_url || '';
+      const webpNormal = anime.images?.webp?.image_url || '';
 
       $('#title').textContent = tituloAnime;
       $('#sub').textContent = `Um amigo te mandou ${tituloAnime}. Escolha como assistir.`;
       document.title = `${tituloAnime} — MEGA ANIME`;
 
-      if (capaAnime) {
-        const img = document.createElement('img');
-        img.referrerPolicy = 'no-referrer';
-        img.alt = `Capa de ${tituloAnime}`;
-        img.src = capaAnime;
-        $('#poster').innerHTML = '';
-        $('#poster').appendChild(img);
-      }
+      setPosterUrl(
+        jpgGrande || jpgNormal || webpGrande || webpNormal,
+        tituloAnime,
+        [jpgNormal, webpGrande, webpNormal]
+      );
 
       const partesMeta = [];
       const ano = anime.year || anime.aired?.prop?.from?.year;
@@ -131,11 +174,11 @@
           .trim();
       }
     } catch (_) {
-      // Falha silenciosa para não atrapalhar a abertura do app ou site
+      $('#poster').textContent = 'Sem capa';
     }
   }
 
-  carregarJikan(fallbackTitle);
+  carregarJikan(fallbackTitle, slug);
 
   const params = (function () {
     const p = new URLSearchParams();
@@ -147,21 +190,35 @@
     return p.toString();
   })();
 
-  const intentUrl = `intent://${ep ? 'player' : 'detail'}?${params}#Intent;scheme=megaanime;package=${PKG};S.browser_fallback_url=${encodeURIComponent(`${SITE}share.html?${params}`)};end`;
+  const intentUrl = `intent://${ep ? 'player' : 'detail'}?${params}#Intent;scheme=megaanime;package=${PKG};S.browser_fallback_url=${encodeURIComponent(DOWNLOAD_URL)};end`;
   const appUrl = `megaanime://${ep ? 'player' : 'detail'}?${params}`;
 
   let left = false;
-  const leave = () => { left = true; };
+  let fallbackTimer = null;
+
+  const leave = () => {
+    left = true;
+    if (fallbackTimer) {
+      clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+    }
+  };
+
   document.addEventListener('visibilitychange', () => { if (document.hidden) leave(); });
   window.addEventListener('blur', leave);
+  window.addEventListener('pagehide', leave);
 
   const openApp = () => {
     left = false;
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+
     $('#status').textContent = 'Abrindo o MEGA ANIME…';
     try { location.href = intentUrl; } catch { location.href = appUrl; }
-    setTimeout(() => {
+
+    fallbackTimer = setTimeout(() => {
       if (left || document.hidden) return;
-      $('#status').textContent = 'O app não abriu. Instale o app ou continue no site.';
+      $('#status').textContent = 'App não encontrado. Indo para o download…';
+      location.href = DOWNLOAD_URL;
     }, 1500);
   };
 
