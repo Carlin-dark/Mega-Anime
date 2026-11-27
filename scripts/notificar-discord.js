@@ -10,7 +10,6 @@ if (!WEBHOOK_URL) {
   process.exit(1);
 }
 
-// Lê a lista de episódios já enviados anteriormente
 function lerEnviados() {
   try {
     if (!fs.existsSync(ARQUIVO_MEMORIA)) return [];
@@ -22,7 +21,6 @@ function lerEnviados() {
   }
 }
 
-// Salva os últimos 400 episódios enviados na memória
 function salvarEnviados(lista) {
   const reduzida = lista.slice(-400);
   fs.writeFileSync(ARQUIVO_MEMORIA, JSON.stringify(reduzida, null, 2), 'utf8');
@@ -30,80 +28,148 @@ function salvarEnviados(lista) {
 
 function limparTexto(html) {
   return html
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
     .replace(/&#8211;/g, '-')
+    .replace(/&#8217;/g, "'")
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-// Coleta os episódios lançados na página inicial do Animes Online Cloud
-async function buscarAnimesOnlineCloud() {
-  const itens = [];
-  try {
-    const res = await fetch(`${SITE_ALVO}/`, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        Accept: 'text/html,application/xhtml+xml'
-      }
-    });
+function normalizarUrl(link) {
+  if (!link) return '';
+  let u = link.trim();
+  if (u.startsWith('//')) u = `https:${u}`;
+  else if (u.startsWith('/')) u = `${SITE_ALVO}${u}`;
+  return u.replace(/\/$/, '');
+}
 
-    if (!res.ok) {
-      console.error('Falha HTTP ao acessar animesonline.cloud:', res.status);
-      return itens;
+// 1. Lê os blocos <article class="... episodes"> da página inicial do tema DooPlay
+async function buscarDaHomeDooPlay() {
+  const itens = [];
+  const res = await fetch(`${SITE_ALVO}/`, {
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8'
+    }
+  });
+
+  console.log('Status HTTP Home:', res.status);
+  if (!res.ok) return itens;
+
+  const html = await res.text();
+  console.log('Tamanho HTML recebido:', html.length);
+
+  const vistos = new Set();
+
+  // Captura cada card <article ... class="... episodes ...">
+  const regexArticles = /<article[^>]*class=["'][^"']*\bepisodes\b[^"']*["'][^>]*>([\s\S]*?)<\/article>/gi;
+  let match;
+
+  while ((match = regexArticles.exec(html)) !== null) {
+    const card = match[1];
+    const linkMatch = card.match(/<a[^>]+href=["']([^"']+)["']/i);
+    if (!linkMatch) continue;
+
+    const url = normalizarUrl(linkMatch[1]);
+    if (!url || vistos.has(url)) continue;
+    vistos.add(url);
+
+    const imgMatch = card.match(/<img[^>]+(?:data-src|data-lazy-src|src)=["']([^"']+)["']/i);
+    const h3Match = card.match(/<h3[^>]*>([\s\S]*?)<\/h3>/i);
+    const h4Match = card.match(/<h4[^>]*>([\s\S]*?)<\/h4>/i);
+    const spanMatch = card.match(/<div[^>]*class=["'][^"']*data[^"']*["'][^>]*>[\s\S]*?<span[^>]*>([\s\S]*?)<\/span>/i);
+
+    const tituloAnime = h3Match ? limparTexto(h3Match[1]) : '';
+    const subTitulo = h4Match ? limparTexto(h4Match[1]) : spanMatch ? limparTexto(spanMatch[1]) : '';
+
+    let tituloFinal = [tituloAnime, subTitulo].filter(Boolean).join(' — ');
+    if (!tituloFinal) {
+      tituloFinal = decodeURIComponent(url.split('/').pop() || '').replace(/-/g, ' ');
     }
 
-    const html = await res.text();
-    const vistos = new Set();
+    const capa = normalizarUrl(imgMatch ? imgMatch[1] : '') || 'https://i.8upload.com/image/4784a42f992b726d/icos.png';
+    const dublado = /dublado/i.test(url) || /dublado/i.test(tituloFinal);
 
-    // Captura os links de episódios recentes na home (ex.: /episodio/... ou /episodios/...)
-    const regexEpisodios =
-      /<a[^>]+href=["'](https?:\/\/animesonline\.cloud\/(?:episodio|episodios)\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    itens.push({
+      id: url,
+      titulo: tituloFinal.slice(0, 150),
+      audio: dublado ? 'Dublado' : 'Legendado',
+      capa
+    });
+  }
 
-    let match;
-    while ((match = regexEpisodios.exec(html)) !== null) {
-      const url = match[1].replace(/\/$/, '');
-      if (vistos.has(url)) continue;
+  // Fallback dentro do próprio HTML caso os links estejam fora de <article class="episodes">
+  if (itens.length === 0) {
+    const regexLinks = /<a[^>]+href=["']((?:https?:\/\/animesonline\.cloud)?\/(?:episodio|episodios|episode)\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    while ((match = regexLinks.exec(html)) !== null) {
+      const url = normalizarUrl(match[1]);
+      if (!url || vistos.has(url)) continue;
 
-      const bloco = match[2];
-      const imgMatch = bloco.match(/<img[^>]+(?:data-src|data-lazy-src|src)=["']([^"']+)["']/i);
-      const altMatch = bloco.match(/alt=["']([^"']+)["']/i);
-
-      let tituloLimpo = limparTexto(bloco);
-      if (!tituloLimpo && altMatch) {
-        tituloLimpo = limparTexto(altMatch[1]);
-      }
-      if (!tituloLimpo) {
-        tituloLimpo = decodeURIComponent(url.split('/').pop() || '').replace(/-/g, ' ');
-      }
-
-      // Ignora links genéricos de menu sem nome de anime/episódio
-      if (!tituloLimpo || tituloLimpo.length < 3 || /^epis[oó]dios$/i.test(tituloLimpo)) {
-        continue;
-      }
+      const texto = limparTexto(match[2]);
+      if (!texto || texto.length < 3 || /^epis[oó]dios$/i.test(texto)) continue;
 
       vistos.add(url);
-
-      let capa = imgMatch ? imgMatch[1] : 'https://i.8upload.com/image/4784a42f992b726d/icos.png';
-      if (capa.startsWith('//')) capa = `https:${capa}`;
-      if (capa.startsWith('/')) capa = `${SITE_ALVO}${capa}`;
-
-      const dublado = /dublado/i.test(url) || /dublado/i.test(tituloLimpo);
-
       itens.push({
         id: url,
-        titulo: tituloLimpo.slice(0, 140),
-        audio: dublado ? 'Dublado' : 'Legendado',
-        capa
+        titulo: texto.slice(0, 150),
+        audio: /dublado/i.test(url) || /dublado/i.test(texto) ? 'Dublado' : 'Legendado',
+        capa: 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
       });
-
-      if (itens.length >= 20) break;
     }
-  } catch (err) {
-    console.error('Erro ao consultar animesonline.cloud:', err.message);
+  }
+
+  return itens;
+}
+
+// 2. Backup via Feed RSS do WordPress (/feed/ ou /episodio/feed/)
+async function buscarDoFeed() {
+  const itens = [];
+  const urlsFeed = [`${SITE_ALVO}/episodio/feed/`, `${SITE_ALVO}/episodios/feed/`, `${SITE_ALVO}/feed/`];
+
+  for (const feedUrl of urlsFeed) {
+    try {
+      const res = await fetch(feedUrl, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+        }
+      });
+      if (!res.ok) continue;
+
+      const xml = await res.text();
+      const regexItem = /<item>([\s\S]*?)<\/item>/gi;
+      let m;
+      while ((m = regexItem.exec(xml)) !== null) {
+        const bloco = m[1];
+        const titleM = bloco.match(/<title>([\s\S]*?)<\/title>/i);
+        const linkM = bloco.match(/<link>([\s\S]*?)<\/link>/i);
+        const imgM = bloco.match(/<img[^>]+src=["']([^"']+)["']/i);
+
+        const url = normalizarUrl(linkM ? limparTexto(linkM[1]) : '');
+        const titulo = titleM ? limparTexto(titleM[1]) : '';
+        if (!url || !titulo) continue;
+
+        itens.push({
+          id: url,
+          titulo: titulo.slice(0, 150),
+          audio: /dublado/i.test(url) || /dublado/i.test(titulo) ? 'Dublado' : 'Legendado',
+          capa: normalizarUrl(imgM ? imgM[1] : '') || 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
+        });
+      }
+
+      if (itens.length > 0) {
+        console.log(`Episódios encontrados via feed (${feedUrl}):`, itens.length);
+        break;
+      }
+    } catch {
+      // tenta o próximo feed
+    }
   }
 
   return itens;
@@ -113,7 +179,6 @@ async function enviarParaDiscord(ep, mencionarEveryone) {
   const payload = {
     username: 'Mega Animes',
     avatar_url: 'https://i.8upload.com/image/4784a42f992b726d/icos.png',
-    // Menciona @everyone apenas na primeira mensagem do lote para não dar vários pings seguidos
     content: mencionarEveryone ? '@everyone Novo episódio chegou no **Mega Animes**!' : undefined,
     allowed_mentions: mencionarEveryone ? { parse: ['everyone'] } : { parse: [] },
     embeds: [
@@ -124,7 +189,7 @@ async function enviarParaDiscord(ep, mencionarEveryone) {
         },
         title: ep.titulo,
         description: `🎧 **Áudio:** ${ep.audio}\n📺 **Qualidade:** SD / HD / FHD\n📱 Já disponível para assistir no aplicativo **Mega Animes**!`,
-        color: 15010068, // Vermelho #E50914
+        color: 15010068,
         thumbnail: {
           url: ep.capa.startsWith('http') ? ep.capa : 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
         },
@@ -151,7 +216,14 @@ async function executar() {
   const enviados = lerEnviados();
   const setEnviados = new Set(enviados);
 
-  const listaAtual = await buscarAnimesOnlineCloud();
+  let listaAtual = await buscarDaHomeDooPlay();
+  if (listaAtual.length === 0) {
+    console.log('Nenhum card encontrado na Home, tentando Feed RSS...');
+    listaAtual = await buscarDoFeed();
+  }
+
+  console.log('Total de episódios coletados:', listaAtual.length);
+
   const novos = listaAtual.filter((item) => !setEnviados.has(item.id));
 
   if (novos.length === 0) {
@@ -159,7 +231,6 @@ async function executar() {
     return;
   }
 
-  // Na primeira execução com memória vazia, envia os 5 mais recentes para evitar spam no canal
   const filaParaEnviar = enviados.length === 0 ? novos.slice(0, 5) : novos;
 
   for (let i = 0; i < filaParaEnviar.length; i++) {
