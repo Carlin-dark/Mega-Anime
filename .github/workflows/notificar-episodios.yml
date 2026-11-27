@@ -2,8 +2,8 @@ name: Notificar Novos Episódios no Discord
 
 on:
   schedule:
-    # Roda todo dia às 19h, 21h e 23h (Horário de Brasília / UTC-3)
-    - cron: '0 22,0,2 * * *'
+    # 22:00 UTC = 19:00 (7 horas da noite no horário de Brasília, UTC-3)
+    - cron: '0 22 * * *'
   workflow_dispatch:
 
 permissions:
