@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.megaanime.app",
+      "sha256_cert_fingerprints": [
+        "7E:0D:41:36:80:28:D3:15:A6:A3:0E:C5:9C:D7:8B:C4:1A:FC:9B:4C:53:9A:1D:FE:75:F0:D4:EB:D2:31:39:32"
+      ]
+    }
+  }
+]
