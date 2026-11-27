@@ -38,7 +38,6 @@
   />
   <meta name="twitter:image" content="https://i.8upload.com/image/8b9572044ce99d61/home-check.png" />
 
-  <!-- Dados estruturados JSON-LD para Google Search -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -50,7 +49,7 @@
       "inLanguage": "pt-BR",
       "url": "https://carlin-dark.github.io/Mega-Anime/",
       "image": "https://i.8upload.com/image/4784a42f992b726d/icos.png",
-      "downloadUrl": "https://files.catbox.moe/rj3h85.apk",
+      "downloadUrl": "https://files.catbox.moe/22zlzc.apk",
       "fileSize": "19.0 MB",
       "offers": {
         "@type": "Offer",
@@ -87,7 +86,6 @@
     };
   </script>
   <style>
-    /* Oculta a barra de rolagem horizontal no carrossel mobile mantendo o deslize suave */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -99,7 +97,7 @@
 </head>
 <body class="bg-black text-white font-sans antialiased selection:bg-[#E50914] selection:text-white overflow-x-hidden">
 
-  <!-- Cabeçalho fixo minimalista no estilo do app -->
+  <!-- Cabeçalho fixo -->
   <header class="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-neutral-900">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <a href="#" class="flex items-center gap-3 group">
@@ -128,7 +126,6 @@
         <a href="#compatibilidade" class="hidden md:inline-flex px-3 py-2 rounded-lg text-neutral-300 hover:text-white hover:bg-neutral-900 transition-colors">
           Compatibilidade
         </a>
-        <!-- Link da Comunidade no Discord ao lado de Compatibilidade -->
         <a
           href="https://discord.gg/Fj2pGvy9gY"
           target="_blank"
@@ -144,21 +141,57 @@
     </div>
   </header>
 
+  <!-- BANNER DINÂMICO DE CONVITE (Só aparece quando o link tem ?anime=...) -->
+  <section id="invite-banner" class="hidden border-b border-red-900/50 bg-gradient-to-r from-[#1f0709] via-[#17090a] to-[#111111]">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
+      <div class="rounded-2xl bg-black/60 border border-[#E50914]/50 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl shadow-red-950/30">
+        <div class="space-y-1">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#E50914]">
+            <span class="w-2 h-2 rounded-full bg-[#E50914] animate-ping"></span>
+            Convite para assistir junto
+          </span>
+          <h2 id="invite-anime-title" class="text-lg sm:text-xl font-extrabold text-white">
+            Anime compartilhado
+          </h2>
+          <p class="text-xs sm:text-sm text-neutral-300">
+            Já tem o <strong class="text-white">Mega Animes</strong> instalado? Toque no botão ao lado. Se ainda não tem, baixe o APK logo abaixo!
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto shrink-0">
+          <a
+            id="btn-open-app"
+            href="#"
+            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#E50914] hover:bg-[#F40612] text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-red-600/30"
+          >
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Abrir no App
+          </a>
+          <a
+            href="#downloads"
+            class="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 font-semibold text-xs sm:text-sm transition-colors"
+          >
+            Baixar APK
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <main>
     <!-- Seção Principal (Hero + Downloads) -->
     <section id="downloads" class="relative pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-neutral-900">
-      <!-- Brilho sutil vermelho ao fundo -->
       <div class="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-red-950/25 via-black to-black"></div>
 
       <div class="relative max-w-5xl mx-auto px-4 sm:px-6">
         <div class="flex flex-col items-center text-center max-w-2xl mx-auto">
-          <!-- Badge de requisito -->
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs sm:text-sm font-medium text-neutral-200 mb-6">
             <span class="w-2 h-2 rounded-full bg-[#E50914] animate-pulse"></span>
             Android 7.0 ou superior
           </div>
 
-          <!-- Ícone Principal do App (sem contorno vermelho) -->
           <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-neutral-950 shadow-2xl mb-5 overflow-hidden flex items-center justify-center relative">
             <img
               data-config-src="iconeApp"
@@ -192,7 +225,7 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <!-- Opção 1: arm64-v8a (Recomendada) -->
+            <!-- Opção 1: arm64-v8a -->
             <div class="relative rounded-2xl bg-[#141414] border-2 border-[#E50914] p-5 flex flex-col justify-between shadow-xl shadow-red-950/20">
               <span class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-md bg-[#E50914] text-[11px] font-bold uppercase tracking-wide text-white">
                 Recomendado
@@ -283,7 +316,6 @@
             </div>
           </div>
 
-          <!-- Aviso de status quando o usuário clica para baixar -->
           <div id="download-feedback" class="hidden mt-4 rounded-xl bg-neutral-900/90 border border-neutral-800 px-4 py-3 text-xs sm:text-sm text-neutral-200 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
               <span class="w-2.5 h-2.5 rounded-full bg-[#E50914] shrink-0"></span>
@@ -297,7 +329,7 @@
       </div>
     </section>
 
-    <!-- Seção de Imagens do App (Carrossel horizontal no celular + Player deitado abaixo) -->
+    <!-- Seção de Imagens do App -->
     <section id="capturas" class="py-14 sm:py-20 border-b border-neutral-900">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
         <div class="mb-6 sm:mb-8 flex items-end justify-between gap-4">
@@ -310,9 +342,7 @@
           <span class="sm:hidden text-xs text-neutral-400 shrink-0">Deslize &rarr;</span>
         </div>
 
-        <!-- Carrossel lado a lado no celular (flex + overflow-x-auto) e grade no desktop -->
         <div class="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 overflow-x-auto sm:overflow-visible snap-x snap-mandatory no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
-          <!-- Tela 1: Início / Catálogo -->
           <figure class="shrink-0 w-[68%] xs:w-[58%] sm:w-auto snap-center rounded-2xl bg-[#121212] border border-neutral-800 p-3 flex flex-col">
             <div class="relative w-full aspect-[9/19] rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/80">
               <img
@@ -320,7 +350,6 @@
                 src="https://i.8upload.com/image/8b9572044ce99d61/home-check.png"
                 alt="Tela inicial do Mega Animes mostrando lançamentos e Top 10"
                 class="w-full h-full object-cover object-top"
-                onerror="this.onerror=null; this.src='https://i.8upload.com/image/8b9572044ce99d61/home-check.png';"
               />
             </div>
             <figcaption class="pt-3 px-1">
@@ -329,7 +358,6 @@
             </figcaption>
           </figure>
 
-          <!-- Tela 2: Detalhes e Episódios -->
           <figure class="shrink-0 w-[68%] xs:w-[58%] sm:w-auto snap-center rounded-2xl bg-[#121212] border border-neutral-800 p-3 flex flex-col">
             <div class="relative w-full aspect-[9/19] rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/80">
               <img
@@ -337,7 +365,6 @@
                 src="https://i.8upload.com/image/3535d76697003787/details-final.png"
                 alt="Tela de detalhes do anime com sinopse, qualidade SD/HD/FHD e lista de episódios"
                 class="w-full h-full object-cover object-top"
-                onerror="this.onerror=null; this.src='https://i.8upload.com/image/3535d76697003787/details-final.png';"
               />
             </div>
             <figcaption class="pt-3 px-1">
@@ -346,7 +373,6 @@
             </figcaption>
           </figure>
 
-          <!-- Tela 3: Busca -->
           <figure class="shrink-0 w-[68%] xs:w-[58%] sm:w-auto snap-center rounded-2xl bg-[#121212] border border-neutral-800 p-3 flex flex-col">
             <div class="relative w-full aspect-[9/19] rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/80">
               <img
@@ -354,7 +380,6 @@
                 src="https://i.8upload.com/image/75373f819df252df/search-check-2.png"
                 alt="Tela de busca do Mega Animes encontrando Re:Zero"
                 class="w-full h-full object-cover object-top"
-                onerror="this.onerror=null; this.src='https://i.8upload.com/image/75373f819df252df/search-check-2.png';"
               />
             </div>
             <figcaption class="pt-3 px-1">
@@ -363,7 +388,6 @@
             </figcaption>
           </figure>
 
-          <!-- Tela 4: Detalhes do Anime -->
           <figure class="shrink-0 w-[68%] xs:w-[58%] sm:w-auto snap-center rounded-2xl bg-[#121212] border border-neutral-800 p-3 flex flex-col">
             <div class="relative w-full aspect-[9/19] rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/80">
               <img
@@ -371,7 +395,6 @@
                 src="https://i.8upload.com/image/62fea37010edc1e9/details-check.png"
                 alt="Página do anime Re:Zero com botão Assistir primeiro episódio"
                 class="w-full h-full object-cover object-top"
-                onerror="this.onerror=null; this.src='https://i.8upload.com/image/62fea37010edc1e9/details-check.png';"
               />
             </div>
             <figcaption class="pt-3 px-1">
@@ -381,7 +404,6 @@
           </figure>
         </div>
 
-        <!-- Tela 5: Player de Vídeo (deitado / paisagem e abaixo das outras imagens) -->
         <figure class="mt-6 rounded-2xl bg-[#121212] border border-neutral-800 p-3 sm:p-4 flex flex-col">
           <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800/80">
             <img
@@ -389,7 +411,6 @@
               src="https://i.8upload.com/image/5621dec8b11a661d/player-controls-check.png"
               alt="Reprodutor de vídeo do Mega Animes em tela cheia"
               class="w-full h-full object-cover object-center"
-              onerror="this.onerror=null; this.src='https://i.8upload.com/image/5621dec8b11a661d/player-controls-check.png';"
             />
           </div>
           <figcaption class="pt-3 px-1">
@@ -411,11 +432,8 @@
         </div>
 
         <div class="space-y-4">
-          <!-- Passo 1 -->
           <div class="rounded-2xl bg-[#141414] border border-neutral-800 p-5 sm:p-6 flex items-start gap-4">
-            <div class="w-9 h-9 rounded-xl bg-[#E50914] text-white font-bold text-base flex items-center justify-center shrink-0">
-              1
-            </div>
+            <div class="w-9 h-9 rounded-xl bg-[#E50914] text-white font-bold text-base flex items-center justify-center shrink-0">1</div>
             <div>
               <h3 class="text-base sm:text-lg font-bold text-white">Baixe o arquivo</h3>
               <p class="text-sm text-neutral-300 mt-1 leading-relaxed">
@@ -424,11 +442,8 @@
             </div>
           </div>
 
-          <!-- Passo 2 -->
           <div class="rounded-2xl bg-[#141414] border border-neutral-800 p-5 sm:p-6 flex items-start gap-4">
-            <div class="w-9 h-9 rounded-xl bg-[#E50914] text-white font-bold text-base flex items-center justify-center shrink-0">
-              2
-            </div>
+            <div class="w-9 h-9 rounded-xl bg-[#E50914] text-white font-bold text-base flex items-center justify-center shrink-0">2</div>
             <div>
               <h3 class="text-base sm:text-lg font-bold text-white">Abra o arquivo</h3>
               <p class="text-sm text-neutral-300 mt-1 leading-relaxed">
@@ -437,135 +452,14 @@
             </div>
           </div>
 
-          <!-- Passo 3 + Ilustração da permissão no navegador -->
           <div class="rounded-2xl bg-[#141414] border border-neutral-800 p-5 sm:p-6">
             <div class="flex items-start gap-4">
-              <div class="w-9 h-9 rounded-xl bg-[#E50914] text-white font-bold text-base flex items-center justify-center shrink-0">
-                3
-              </div>
+              <div class="w-9 h-9 rounded-xl bg-[#E50914] text-white font-bold text-base flex items-center justify-center shrink-0">3</div>
               <div class="w-full">
                 <h3 class="text-base sm:text-lg font-bold text-white">Instale</h3>
                 <p class="text-sm text-neutral-300 mt-1 leading-relaxed">
                   Se o Android pedir, toque em <strong class="text-white font-semibold">Configurações</strong> e permita instalar apps desconhecidos para o seu navegador.
                 </p>
-
-                <!-- Ilustração da permissão no Google Chrome (ou imagem externa via URL em imgPermissao) -->
-                <div class="mt-5 max-w-sm mx-auto sm:mx-0">
-                  <img
-                    data-config-src="imgPermissao"
-                    alt="Permissão para instalar apps desconhecidos no Google Chrome"
-                    class="hidden w-full rounded-2xl border border-neutral-800 shadow-lg"
-                    onload="this.classList.remove('hidden'); document.getElementById('chrome-permission-card').classList.add('hidden');"
-                    onerror="this.classList.add('hidden'); document.getElementById('chrome-permission-card').classList.remove('hidden');"
-                  />
-                  <div id="chrome-permission-card" class="rounded-2xl bg-[#0D0D0D] border border-neutral-800 overflow-hidden shadow-lg">
-                    <!-- Barra superior estilo Configurações do Android -->
-                    <div class="px-4 py-2.5 bg-neutral-900/90 border-b border-neutral-800 flex items-center gap-2 text-xs text-neutral-400">
-                      <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                      </svg>
-                      <span>Instalar apps desconhecidos</span>
-                    </div>
-
-                    <!-- Ícone do Google Chrome -->
-                    <div class="p-4">
-                      <div class="flex items-center gap-3 pb-4 border-b border-neutral-900">
-                        <div class="w-10 h-10 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow">
-                          <svg class="w-full h-full" viewBox="0 0 48 48" aria-label="Google Chrome">
-                            <defs>
-                              <clipPath id="chrome-circle">
-                                <circle cx="24" cy="24" r="22" />
-                              </clipPath>
-                            </defs>
-                            <g clip-path="url(#chrome-circle)">
-                              <!-- Parte superior vermelha -->
-                              <path fill="#EA4335" d="M2 2h44v22H24L14 14z" />
-                              <!-- Parte inferior esquerda verde -->
-                              <path fill="#34A853" d="M2 2h12l10 22-10 22H2z" />
-                              <!-- Parte inferior direita amarela -->
-                              <path fill="#FBBC05" d="M24 14h22v32H14l10-22z" />
-                              <!-- Anel branco e centro azul -->
-                              <circle cx="24" cy="24" r="10.5" fill="#FFFFFF" />
-                              <circle cx="24" cy="24" r="8.2" fill="#4285F4" />
-                            </g>
-                          </svg>
-                        </div>
-                        <div>
-                          <p class="text-sm font-semibold text-white">Google Chrome</p>
-                          <p class="text-[11px] text-neutral-400">Navegador</p>
-                        </div>
-                      </div>
-
-                      <!-- Chave de permissão ativada -->
-                      <div class="pt-4 flex items-center justify-between gap-3">
-                        <div>
-                          <p class="text-xs sm:text-sm font-medium text-white">Permitir desta fonte</p>
-                          <p class="text-[11px] text-neutral-400 mt-0.5">Ative esta opção e volte para concluir</p>
-                        </div>
-                        <div class="w-11 h-6 rounded-full bg-[#E50914] p-0.5 flex items-center justify-end shrink-0 shadow-inner">
-                          <div class="w-5 h-5 rounded-full bg-white shadow"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Explicação e ilustração do aviso do Google Play Protect ao instalar -->
-                <div class="mt-6 pt-5 border-t border-neutral-800/80 space-y-3">
-                  <div>
-                    <h4 class="text-sm font-bold text-white">
-                      Por que aparece o aviso do Google Play Protect?
-                    </h4>
-                    <p class="text-xs sm:text-sm text-neutral-300 mt-1 leading-relaxed">
-                      Como o <strong class="text-white font-semibold">Mega Animes</strong> é instalado diretamente por arquivo APK fora da Google Play Store, o sistema do Android exibe essa tela padrão para qualquer aplicativo que ainda não passou pela loja oficial. Isso é normal e não indica problema no arquivo — basta tocar em <strong class="text-white font-semibold underline decoration-neutral-400">“Instalar sem análise”</strong> (ou em <strong class="text-white font-semibold">“Verificar app”</strong>) para continuar a instalação normalmente.
-                    </p>
-                  </div>
-
-                  <div class="max-w-sm mx-auto sm:mx-0">
-                    <img
-                      data-config-src="imgPlayProtect"
-                      alt="Aviso do Google Play Protect com opção Instalar sem análise"
-                      class="hidden w-full rounded-2xl border border-neutral-800 shadow-lg"
-                      onload="this.classList.remove('hidden'); document.getElementById('play-protect-card').classList.add('hidden');"
-                      onerror="this.classList.add('hidden'); document.getElementById('play-protect-card').classList.remove('hidden');"
-                    />
-                    <div id="play-protect-card" class="rounded-2xl bg-[#242424] border border-neutral-700/80 p-4 shadow-xl text-center space-y-3.5">
-                      <div class="flex items-center justify-center gap-1.5 text-xs font-medium text-neutral-300">
-                        <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                        </svg>
-                        <span>Google Play Protect</span>
-                      </div>
-
-                      <h5 class="text-sm font-semibold text-white leading-snug">
-                        A verificação do app é recomendada
-                      </h5>
-
-                      <div class="rounded-2xl bg-[#181818] border border-neutral-700/60 px-3.5 py-2.5 flex items-center gap-3 text-left">
-                        <img
-                          src="https://i.8upload.com/image/4784a42f992b726d/icos.png"
-                          alt="Ícone do app"
-                          class="w-7 h-7 rounded-lg object-cover bg-neutral-900 shrink-0"
-                          onerror="this.style.display='none'"
-                        />
-                        <span class="text-xs font-semibold text-neutral-100 truncate">Mega Anime</span>
-                      </div>
-
-                      <p class="text-[11px] text-neutral-300 leading-relaxed">
-                        Este app ainda não foi analisado pelo Play Protect. Para instalar mesmo assim, toque em <strong class="text-white font-semibold underline decoration-neutral-400">Instalar sem análise</strong>.
-                      </p>
-
-                      <div class="pt-0.5 space-y-2">
-                        <div class="w-full py-2 px-3 rounded-full bg-[#A8C7FA] text-[#062E6F] text-xs font-bold">
-                          Verificar app
-                        </div>
-                        <div class="w-full py-2 px-3 rounded-full bg-[#A8C7FA] text-[#062E6F] text-xs font-bold">
-                          Não instalar app
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -573,7 +467,7 @@
       </div>
     </section>
 
-    <!-- Seção de Solução de Problemas / Compatibilidade -->
+    <!-- Seção Compatibilidade -->
     <section id="compatibilidade" class="py-14 sm:py-20">
       <div class="max-w-3xl mx-auto px-4 sm:px-6">
         <div class="rounded-2xl bg-gradient-to-br from-[#191112] to-[#121212] border border-red-900/40 p-6 sm:p-8">
@@ -584,40 +478,10 @@
               </svg>
             </div>
             <div>
-              <h2 class="text-lg sm:text-xl font-bold text-white">
-                Apareceu “App não instalado”?
-              </h2>
+              <h2 class="text-lg sm:text-xl font-bold text-white">Apareceu “App não instalado”?</h2>
               <p class="text-sm text-neutral-300 mt-1.5 leading-relaxed">
-                Provavelmente você baixou uma versão que não é compatível com o processador do seu celular.
+                Provavelmente você baixou uma versão que não é compatível com o processador do seu celular. Escolha <span class="text-white font-medium">arm64-v8a</span> (mais recente) ou <span class="text-white font-medium">armeabi-v7a</span> (mais antigo).
               </p>
-              <p class="text-sm text-neutral-300 mt-3 leading-relaxed">
-                <strong class="text-white font-semibold">Escolha a versão que seu dispositivo suporta:</strong>
-                a maioria dos celulares atuais usa <span class="text-white font-medium">arm64-v8a</span>, enquanto aparelhos mais antigos usam <span class="text-white font-medium">armeabi-v7a</span>.
-              </p>
-
-              <!-- Link externo para conferir a arquitetura ABI do dispositivo -->
-              <div class="mt-5 flex flex-wrap items-center gap-3">
-                <a
-                  href="https://www.gsmarena.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#E50914] hover:bg-[#F40612] text-white text-xs sm:text-sm font-semibold transition-colors shadow-lg shadow-red-600/20"
-                >
-                  <span>Ver arquitetura do meu celular (GSMArena)</span>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                  </svg>
-                </a>
-
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.finalwire.aida64"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs sm:text-sm font-medium transition-colors"
-                >
-                  <span>Checar via AIDA64 (CPU / Conjunto de Instruções)</span>
-                </a>
-              </div>
             </div>
           </div>
         </div>
@@ -625,7 +489,6 @@
     </section>
   </main>
 
-  <!-- Rodapé -->
   <footer class="border-t border-neutral-900 py-8 text-center text-xs text-neutral-500">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p>Mega Animes &mdash; Android 7.0 ou superior</p>
@@ -634,50 +497,67 @@
   </footer>
 
   <script>
-    // =========================================================================
-    // CONFIGURAÇÃO DE LINKS E IMAGENS POR URL
-    // Cole aqui os links diretos (URLs) dos seus APKs, ícone e imagens do app.
-    // =========================================================================
     const CONFIG_SITE = {
-      // 1. URLs de Download dos APKs
       apkArm64: "https://files.catbox.moe/22zlzc.apk",
       apkArmV7: "https://files.catbox.moe/o7kud4.apk",
       apkX86:   "https://files.catbox.moe/r13c6w.apk",
-
-      // 2. URL do Ícone do App (deixe "" para usar o ícone vermelho padrão)
       iconeApp: "https://i.8upload.com/image/4784a42f992b726d/icos.png",
+      imgInicio:    "https://i.8upload.com/image/8480bb16d4341798/mega_keyboard.png",
+      imgEpisodios: "https://i.8upload.com/image/cad6838931562ebc/mega_testdetail.png",
+      imgBusca:     "https://i.8upload.com/image/75373f819df252df/search-check-2.png",
+      imgDetalhes:  "https://i.8upload.com/image/62fea37010edc1e9/details-check.png",
+      imgPlayer:    "https://i.8upload.com/image/418862a71012b02d/mega_final_player_controls.png",
+      imgPermissao: "",
 
-      // 3. URLs das Imagens do App (prints na vertical + player deitado)
-      imgInicio:    "https://i.8upload.com/image/8480bb16d4341798/mega_keyboard.png", // Tela inicial / catálogo
-      imgEpisodios: "https://i.8upload.com/image/cad6838931562ebc/mega_testdetail.png", // Tela de detalhes e lista de episódios
-      imgBusca:     "https://i.8upload.com/image/75373f819df252df/search-check-2.png", // Tela de busca
-      imgDetalhes:  "https://i.8upload.com/image/62fea37010edc1e9/details-check.png", // Ficha do anime
-      imgPlayer:    "https://i.8upload.com/image/418862a71012b02d/mega_final_player_controls.png", // Player de vídeo
-
-      // 4. URL opcional do print de permissão do navegador (deixe "" para manter o card do Chrome)
-      imgPermissao: ""
+      // ATENÇÃO: coloque aqui o mesmo esquema (scheme) configurado no AndroidManifest.xml do seu APK
+      appScheme: "megaanime"
     };
 
-    // Aplica automaticamente todas as URLs configuradas acima na página
     document.addEventListener("DOMContentLoaded", () => {
+      // 1. Aplica URLs de download e imagens
       document.querySelectorAll("[data-config-href]").forEach((el) => {
         const chave = el.getAttribute("data-config-href");
         const url = CONFIG_SITE[chave];
-        if (url && !url.startsWith("COLE_AQUI_")) {
-          el.href = url;
-        }
+        if (url) el.href = url;
       });
 
       document.querySelectorAll("[data-config-src]").forEach((el) => {
         const chave = el.getAttribute("data-config-src");
         const url = CONFIG_SITE[chave];
-        if (url && !url.startsWith("COLE_AQUI_")) {
-          el.src = url;
-        }
+        if (url) el.src = url;
       });
+
+      // 2. Lê os parâmetros do link compartilhado (?anime=...&source=...&name=...)
+      const params = new URLSearchParams(window.location.search);
+      const animeSlug = params.get("anime");
+      const animeName = params.get("name");
+      const queryString = window.location.search; // ex: ?anime=dragon-ball-super-dublado&source=...
+
+      if (animeSlug || animeName) {
+        const banner = document.getElementById("invite-banner");
+        const titleEl = document.getElementById("invite-anime-title");
+        const btnOpenApp = document.getElementById("btn-open-app");
+
+        // Monta o deep link que o APK escuta (ex: megaanime://watch?anime=...&source=...&name=...)
+        const deepLink = `${CONFIG_SITE.appScheme}://watch${queryString}`;
+
+        if (titleEl) {
+          titleEl.textContent = animeName || animeSlug;
+        }
+        if (btnOpenApp) {
+          btnOpenApp.href = deepLink;
+        }
+        if (banner) {
+          banner.classList.remove("hidden");
+        }
+
+        // Tenta abrir o aplicativo automaticamente após 400ms (se não tiver instalado, fica nesta página)
+        setTimeout(() => {
+          window.location.href = deepLink;
+        }, 400);
+      }
     });
 
-    // Exibe uma barra discreta confirmando qual APK foi selecionado para download
     function notificarDownload(nomeArquivo, tamanho) {
       const box = document.getElementById('download-feedback');
       const texto = document.getElementById('download-feedback-text');
