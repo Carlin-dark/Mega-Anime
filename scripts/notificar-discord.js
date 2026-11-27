@@ -3,6 +3,7 @@ const path = require('path');
 
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 const ARQUIVO_MEMORIA = path.join(__dirname, 'enviados.json');
+const SITE_ALVO = 'https://animesonline.cloud';
 
 if (!WEBHOOK_URL) {
   console.error('Erro: DISCORD_WEBHOOK_URL não configurado nos Secrets do GitHub.');
@@ -21,9 +22,9 @@ function lerEnviados() {
   }
 }
 
-// Salva os últimos 300 episódios enviados
+// Salva os últimos 400 episódios enviados na memória
 function salvarEnviados(lista) {
-  const reduzida = lista.slice(-300);
+  const reduzida = lista.slice(-400);
   fs.writeFileSync(ARQUIVO_MEMORIA, JSON.stringify(reduzida, null, 2), 'utf8');
 }
 
@@ -33,100 +34,92 @@ function limparTexto(html) {
     .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
+    .replace(/&#8211;/g, '-')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-// Coleta lançamentos recentes do AnimesBrasil
-async function buscarAnimesBrasil() {
+// Coleta os episódios lançados na página inicial do Animes Online Cloud
+async function buscarAnimesOnlineCloud() {
   const itens = [];
   try {
-    const res = await fetch('https://animesbrasil.app/', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+    const res = await fetch(`${SITE_ALVO}/`, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml'
+      }
     });
-    if (!res.ok) return itens;
-    const html = await res.text();
 
-    const regex = /<a[^>]+href=["'](https:\/\/animesbrasil\.app\/episodio\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
-    let match;
+    if (!res.ok) {
+      console.error('Falha HTTP ao acessar animesonline.cloud:', res.status);
+      return itens;
+    }
+
+    const html = await res.text();
     const vistos = new Set();
 
-    while ((match = regex.exec(html)) !== null) {
-      const url = match[1];
+    // Captura os links de episódios recentes na home (ex.: /episodio/... ou /episodios/...)
+    const regexEpisodios =
+      /<a[^>]+href=["'](https?:\/\/animesonline\.cloud\/(?:episodio|episodios)\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+
+    let match;
+    while ((match = regexEpisodios.exec(html)) !== null) {
+      const url = match[1].replace(/\/$/, '');
       if (vistos.has(url)) continue;
-      vistos.add(url);
 
       const bloco = match[2];
-      const imgMatch = bloco.match(/<img[^>]+(?:data-src|src)=["']([^"']+)["']/i);
-      const capa = imgMatch ? imgMatch[1] : 'https://i.8upload.com/image/4784a42f992b726d/icos.png';
-      const tituloLimpo = limparTexto(bloco) || url.split('/').pop().replace(/-/g, ' ');
+      const imgMatch = bloco.match(/<img[^>]+(?:data-src|data-lazy-src|src)=["']([^"']+)["']/i);
+      const altMatch = bloco.match(/alt=["']([^"']+)["']/i);
+
+      let tituloLimpo = limparTexto(bloco);
+      if (!tituloLimpo && altMatch) {
+        tituloLimpo = limparTexto(altMatch[1]);
+      }
+      if (!tituloLimpo) {
+        tituloLimpo = decodeURIComponent(url.split('/').pop() || '').replace(/-/g, ' ');
+      }
+
+      // Ignora links genéricos de menu sem nome de anime/episódio
+      if (!tituloLimpo || tituloLimpo.length < 3 || /^epis[oó]dios$/i.test(tituloLimpo)) {
+        continue;
+      }
+
+      vistos.add(url);
+
+      let capa = imgMatch ? imgMatch[1] : 'https://i.8upload.com/image/4784a42f992b726d/icos.png';
+      if (capa.startsWith('//')) capa = `https:${capa}`;
+      if (capa.startsWith('/')) capa = `${SITE_ALVO}${capa}`;
+
       const dublado = /dublado/i.test(url) || /dublado/i.test(tituloLimpo);
 
       itens.push({
         id: url,
-        titulo: tituloLimpo.slice(0, 120),
+        titulo: tituloLimpo.slice(0, 140),
         audio: dublado ? 'Dublado' : 'Legendado',
         capa
       });
 
-      if (itens.length >= 15) break;
+      if (itens.length >= 20) break;
     }
   } catch (err) {
-    console.warn('Falha ao consultar AnimesBrasil:', err.message);
+    console.error('Erro ao consultar animesonline.cloud:', err.message);
   }
+
   return itens;
 }
 
-// Coleta lançamentos recentes do Goyabu
-async function buscarGoyabu() {
-  const itens = [];
-  try {
-    const res = await fetch('https://goyabu.io/inicio', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-    });
-    if (!res.ok) return itens;
-    const html = await res.text();
-
-    const regex = /<a[^>]+href=["'](https:\/\/goyabu\.io\/\d+\/?)["'][^>]*>([\s\S]*?)<\/a>/gi;
-    let match;
-    const vistos = new Set();
-
-    while ((match = regex.exec(html)) !== null) {
-      const url = match[1];
-      if (vistos.has(url)) continue;
-      vistos.add(url);
-
-      const bloco = match[2];
-      const imgMatch = bloco.match(/<img[^>]+(?:data-src|src)=["']([^"']+)["']/i);
-      const capa = imgMatch ? imgMatch[1] : 'https://i.8upload.com/image/4784a42f992b726d/icos.png';
-      const tituloLimpo = limparTexto(bloco);
-      if (!tituloLimpo) continue;
-
-      const dublado = /dublado/i.test(tituloLimpo);
-
-      itens.push({
-        id: url,
-        titulo: tituloLimpo.slice(0, 120),
-        audio: dublado ? 'Dublado' : 'Legendado',
-        capa
-      });
-
-      if (itens.length >= 15) break;
-    }
-  } catch (err) {
-    console.warn('Falha ao consultar Goyabu:', err.message);
-  }
-  return itens;
-}
-
-async function enviarParaDiscord(ep) {
+async function enviarParaDiscord(ep, mencionarEveryone) {
   const payload = {
     username: 'Mega Animes',
     avatar_url: 'https://i.8upload.com/image/4784a42f992b726d/icos.png',
+    // Menciona @everyone apenas na primeira mensagem do lote para não dar vários pings seguidos
+    content: mencionarEveryone ? '@everyone Novo episódio chegou no **Mega Animes**!' : undefined,
+    allowed_mentions: mencionarEveryone ? { parse: ['everyone'] } : { parse: [] },
     embeds: [
       {
         author: {
-          name: 'Mega Animes • Novo Episódio Disponível',
+          name: 'Mega Animes • Atualização da Noite',
           icon_url: 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
         },
         title: ep.titulo,
@@ -158,34 +151,29 @@ async function executar() {
   const enviados = lerEnviados();
   const setEnviados = new Set(enviados);
 
-  const [listaAB, listaGoyabu] = await Promise.all([
-    buscarAnimesBrasil(),
-    buscarGoyabu()
-  ]);
-
-  const todos = [...listaAB, ...listaGoyabu];
-  const novos = todos.filter((item) => !setEnviados.has(item.id));
+  const listaAtual = await buscarAnimesOnlineCloud();
+  const novos = listaAtual.filter((item) => !setEnviados.has(item.id));
 
   if (novos.length === 0) {
-    console.log('Nenhum episódio novo encontrado agora.');
+    console.log('Nenhum episódio novo encontrado no animesonline.cloud hoje.');
     return;
   }
 
-  // Na primeira execução, se a memória estiver vazia, envia apenas os 5 mais recentes para não dar spam no canal
+  // Na primeira execução com memória vazia, envia os 5 mais recentes para evitar spam no canal
   const filaParaEnviar = enviados.length === 0 ? novos.slice(0, 5) : novos;
 
-  for (const ep of filaParaEnviar) {
-    await enviarParaDiscord(ep);
+  for (let i = 0; i < filaParaEnviar.length; i++) {
+    const ep = filaParaEnviar[i];
+    await enviarParaDiscord(ep, i === 0);
     await new Promise((r) => setTimeout(r, 1500));
   }
 
-  // Marca todos os encontrados na memória para não duplicar
   for (const item of novos) {
     setEnviados.add(item.id);
   }
 
   salvarEnviados([...setEnviados]);
-  console.log(`${filaParaEnviar.length} notificação(ões) enviada(s) ao Discord!`);
+  console.log(`${filaParaEnviar.length} episódio(s) notificado(s) no Discord!`);
 }
 
 executar();
