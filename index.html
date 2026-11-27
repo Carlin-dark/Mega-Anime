@@ -144,45 +144,6 @@
     </div>
   </header>
 
-  <!-- Banner de Convite Compartilhado (aparece quando há parâmetros na URL) -->
-  <section id="invite-banner" class="hidden border-b border-red-900/50 bg-gradient-to-r from-[#1f0709] via-[#17090a] to-[#111111]">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
-      <div class="rounded-2xl bg-black/60 border border-[#E50914]/50 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl shadow-red-950/30">
-        <div class="space-y-1">
-          <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#E50914]">
-            <span class="w-2 h-2 rounded-full bg-[#E50914] animate-ping"></span>
-            Convite para assistir junto
-          </span>
-          <h2 id="invite-anime-title" class="text-lg sm:text-xl font-extrabold text-white">
-            Anime compartilhado
-          </h2>
-          <p class="text-xs sm:text-sm text-neutral-300">
-            Já tem o <strong class="text-white">Mega Animes</strong> instalado? Toque em <strong class="text-white">Abrir no App</strong>. Se ainda não tiver, baixe o APK abaixo!
-          </p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto shrink-0">
-          <a
-            id="btn-open-app"
-            href="#"
-            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#E50914] hover:bg-[#F40612] text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-red-600/30"
-          >
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            Abrir no App
-          </a>
-          <a
-            href="#downloads"
-            class="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 font-semibold text-xs sm:text-sm transition-colors"
-          >
-            Baixar APK
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <main>
     <!-- Seção Principal (Hero + Downloads) -->
     <section id="downloads" class="relative pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-neutral-900">
@@ -694,10 +655,7 @@
       imgPlayer:    "https://i.8upload.com/image/418862a71012b02d/mega_final_player_controls.png", // Player de vídeo
 
       // 4. URL opcional do print de permissão do navegador (deixe "" para manter o card do Chrome)
-      imgPermissao: "",
-
-      // 5. Esquema (scheme) configurado no AndroidManifest.xml do seu APK
-      appScheme: "megaanime"
+      imgPermissao: ""
     };
 
     // Aplica automaticamente todas as URLs configuradas acima na página
@@ -717,34 +675,6 @@
           el.src = url;
         }
       });
-
-      // Verifica se o link veio com parâmetros de compartilhamento (?anime=...&source=...&name=...)
-      const params = new URLSearchParams(window.location.search);
-      const animeSlug = params.get("anime");
-      const animeName = params.get("name");
-      const queryString = window.location.search;
-
-      if (animeSlug || animeName) {
-        const banner = document.getElementById("invite-banner");
-        const titleEl = document.getElementById("invite-anime-title");
-        const btnOpenApp = document.getElementById("btn-open-app");
-        const deepLink = `${CONFIG_SITE.appScheme}://watch${queryString}`;
-
-        if (titleEl) {
-          titleEl.textContent = animeName || animeSlug;
-        }
-        if (btnOpenApp) {
-          btnOpenApp.href = deepLink;
-        }
-        if (banner) {
-          banner.classList.remove("hidden");
-        }
-
-        // Tenta abrir o aplicativo instalado automaticamente; se não tiver, fica na página de download
-        setTimeout(() => {
-          window.location.href = deepLink;
-        }, 400);
-      }
     });
 
     // Exibe uma barra discreta confirmando qual APK foi selecionado para download

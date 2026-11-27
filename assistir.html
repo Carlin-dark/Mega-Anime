@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assistir no Mega Animes — Convite</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#E50914" />
+  <link rel="icon" type="image/png" href="https://i.8upload.com/image/4784a42f992b726d/icos.png" />
+
+  <!-- Open Graph / Compartilhamento -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:site_name" content="Mega Animes" />
+  <meta property="og:title" content="Bora assistir juntos no Mega Animes! 🎬" />
+  <meta
+    property="og:description"
+    content="Toque para abrir o anime direto no aplicativo Mega Animes ou baixar o APK oficial para Android."
+  />
+  <meta property="og:image" content="https://i.8upload.com/image/8b9572044ce99d61/home-check.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    };
+  </script>
+</head>
+<body class="min-h-screen bg-black text-white font-sans antialiased selection:bg-[#E50914] selection:text-white flex flex-col justify-between overflow-x-hidden">
+
+  <!-- Cabeçalho minimalista -->
+  <header class="bg-black/90 backdrop-blur-md border-b border-neutral-900">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="./index.html" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-xl bg-neutral-900 flex items-center justify-center shadow-lg overflow-hidden">
+          <img
+            src="https://i.8upload.com/image/4784a42f992b726d/icos.png"
+            alt="Mega Animes"
+            class="w-full h-full object-cover"
+            onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+          />
+          <svg class="w-5 h-5 text-[#E50914] fill-current ml-0.5 hidden" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+        <span class="text-lg sm:text-xl font-bold tracking-tight text-white">Mega Animes</span>
+      </a>
+
+      <a
+        href="./index.html#downloads"
+        class="px-3 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs sm:text-sm font-medium text-neutral-200 transition-colors"
+      >
+        Baixar APK
+      </a>
+    </div>
+  </header>
+
+  <!-- Conteúdo Central: Tentativa automática + Mensagem de convite -->
+  <main class="relative flex-1 flex items-center justify-center px-4 sm:px-6 py-12">
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-red-950/30 via-black to-black"></div>
+
+    <div class="relative w-full max-w-2xl">
+      <!-- Card idêntico ao banner de convite -->
+      <div class="rounded-2xl bg-gradient-to-r from-[#1f0709] via-[#17090a] to-[#111111] border border-red-900/50 p-1.5 shadow-2xl shadow-red-950/30">
+        <div class="rounded-xl bg-black/70 border border-[#E50914]/50 p-5 sm:p-7 flex flex-col gap-5">
+          <div class="flex items-center gap-3.5">
+            <img
+              src="https://i.8upload.com/image/4784a42f992b726d/icos.png"
+              alt="Mega Animes"
+              class="w-12 h-12 rounded-2xl object-cover bg-neutral-900 shrink-0 shadow-lg"
+              onerror="this.style.display='none'"
+            />
+            <div class="space-y-1">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#E50914]">
+                <span class="w-2 h-2 rounded-full bg-[#E50914] animate-ping"></span>
+                Convite para assistir junto
+              </span>
+              <h1 id="invite-anime-title" class="text-xl sm:text-2xl font-extrabold text-white leading-tight">
+                Abrindo no Mega Animes...
+              </h1>
+            </div>
+          </div>
+
+          <p class="text-xs sm:text-sm text-neutral-300 leading-relaxed">
+            Já tem o <strong class="text-white">Mega Animes</strong> instalado? Toque em <strong class="text-white">Abrir no App</strong>. Se ainda não tiver, baixe o APK logo abaixo!
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+            <a
+              id="btn-open-app"
+              href="#"
+              class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#E50914] hover:bg-[#F40612] active:scale-[0.99] text-white font-bold text-sm transition-all shadow-lg shadow-red-600/30"
+            >
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              Abrir no App
+            </a>
+            <a
+              href="./index.html#downloads"
+              class="flex-1 inline-flex items-center justify-center px-5 py-3.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-200 font-semibold text-sm transition-colors"
+            >
+              Baixar APK
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Rodapé -->
+  <footer class="border-t border-neutral-900 py-6 text-center text-xs text-neutral-500">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>Mega Animes &mdash; Android 7.0 ou superior</p>
+      <a href="./index.html" class="text-neutral-400 hover:text-white transition-colors">Ir para a página inicial</a>
+    </div>
+  </footer>
+
+  <script>
+    const APP_SCHEME = "megaanime"; // Mesmo scheme configurado no AndroidManifest.xml
+
+    (function abrirAppAutomaticamente() {
+      const params = new URLSearchParams(window.location.search);
+      const animeSlug = params.get("anime");
+      const animeName = params.get("name");
+      const queryString = window.location.search;
+
+      const titleEl = document.getElementById("invite-anime-title");
+      const btnOpenApp = document.getElementById("btn-open-app");
+
+      // Monta o deep link (ex: megaanime://watch?anime=dragon-ball-super-dublado&source=...&name=...)
+      const deepLink = `${APP_SCHEME}://watch${queryString}`;
+
+      if (titleEl) {
+        titleEl.textContent = animeName || animeSlug || "Mega Animes";
+      }
+      if (btnOpenApp) {
+        btnOpenApp.href = deepLink;
+      }
+
+      // Dispara imediatamente na hora que o usuário entra na página
+      if (animeSlug || animeName || queryString) {
+        window.location.replace(deepLink);
+      }
+    })();
+  </script>
+</body>
+</html>
