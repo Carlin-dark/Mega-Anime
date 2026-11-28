@@ -4,6 +4,14 @@ const path = require('path');
 const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 const ARQUIVO_MEMORIA = path.join(__dirname, 'enviados.json');
 const SITE_ALVO = 'https://animesonline.cloud';
+const CAPA_FALLBACK = 'https://i.8upload.com/image/4784a42f992b726d/icos.png';
+
+const HEADERS_PADRAO = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8'
+};
 
 if (!WEBHOOK_URL) {
   console.error('Erro: DISCORD_WEBHOOK_URL não configurado nos Secrets do GitHub.');
@@ -42,22 +50,90 @@ function limparTexto(html) {
 function normalizarUrl(link) {
   if (!link) return '';
   let u = link.trim();
+  if (!u || u.startsWith('data:')) return '';
   if (u.startsWith('//')) u = `https:${u}`;
   else if (u.startsWith('/')) u = `${SITE_ALVO}${u}`;
   return u.replace(/\/$/, '');
 }
 
+function ehImagemValida(url) {
+  if (!url) return false;
+  if (!url.startsWith('http')) return false;
+  if (url.startsWith('data:')) return false;
+  if (url === CAPA_FALLBACK) return false;
+  if (/logo|Icone\.png|play1\.svg|blank\.gif|placeholder/i.test(url)) return false;
+  return true;
+}
+
+// Extrai a melhor URL real de uma tag <img ...> ignorando placeholders lazy-load
+function extrairCapaDeHtml(trechoHtml) {
+  if (!trechoHtml) return '';
+
+  const atributos = ['data-src', 'data-lazy-src', 'data-original', 'data-bg', 'src'];
+  for (const attr of atributos) {
+    const regex = new RegExp(`<img[^>]+\\b${attr}=["']([^"']+)["']`, 'i');
+    const match = trechoHtml.match(regex);
+    if (match && match[1]) {
+      const candidata = normalizarUrl(match[1]);
+      if (ehImagemValida(candidata)) return candidata;
+    }
+  }
+
+  // Tenta extrair a primeira URL de srcset / data-srcset
+  const srcsetMatch = trechoHtml.match(/<img[^>]+(?:data-srcset|srcset)=["']([^"']+)["']/i);
+  if (srcsetMatch && srcsetMatch[1]) {
+    const primeira = srcsetMatch[1].split(',')[0].trim().split(/\s+/)[0];
+    const candidata = normalizarUrl(primeira);
+    if (ehImagemValida(candidata)) return candidata;
+  }
+
+  return '';
+}
+
+// Busca a capa real diretamente dentro da página do episódio (og:image / twitter:image / pôster)
+async function buscarCapaDaPaginaEpisodio(urlEpisodio) {
+  try {
+    const res = await fetch(urlEpisodio, { headers: HEADERS_PADRAO });
+    if (!res.ok) return '';
+    const html = await res.text();
+
+    const metaPatterns = [
+      /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,
+      /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i
+    ];
+
+    for (const pattern of metaPatterns) {
+      const m = html.match(pattern);
+      if (m && m[1]) {
+        const candidata = normalizarUrl(m[1]);
+        if (ehImagemValida(candidata)) return candidata;
+      }
+    }
+
+    // Fallback: procura imagem do pôster/capa dentro da página do episódio
+    const posterArea = html.match(/<div[^>]*class=["'][^"']*(?:poster|thumb|sheader|imagen)[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+    if (posterArea) {
+      const imgPoster = extrairCapaDeHtml(posterArea[1]);
+      if (ehImagemValida(imgPoster)) return imgPoster;
+    }
+
+    // Fallback geral: primeira imagem de /wp-content/uploads/ ou CDN do site
+    const uploadMatch = html.match(/https?:\/\/[^"'\s>]+\/wp-content\/uploads\/[^"'\s>]+\.(?:jpg|jpeg|png|webp)/i);
+    if (uploadMatch && ehImagemValida(uploadMatch[0])) {
+      return uploadMatch[0];
+    }
+  } catch {
+    // ignora falha pontual
+  }
+  return '';
+}
+
 // 1. Lê os blocos <article class="... episodes"> da página inicial do tema DooPlay
 async function buscarDaHomeDooPlay() {
   const itens = [];
-  const res = await fetch(`${SITE_ALVO}/`, {
-    headers: {
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8'
-    }
-  });
+  const res = await fetch(`${SITE_ALVO}/`, { headers: HEADERS_PADRAO });
 
   console.log('Status HTTP Home:', res.status);
   if (!res.ok) return itens;
@@ -80,7 +156,6 @@ async function buscarDaHomeDooPlay() {
     if (!url || vistos.has(url)) continue;
     vistos.add(url);
 
-    const imgMatch = card.match(/<img[^>]+(?:data-src|data-lazy-src|src)=["']([^"']+)["']/i);
     const h3Match = card.match(/<h3[^>]*>([\s\S]*?)<\/h3>/i);
     const h4Match = card.match(/<h4[^>]*>([\s\S]*?)<\/h4>/i);
     const spanMatch = card.match(/<div[^>]*class=["'][^"']*data[^"']*["'][^>]*>[\s\S]*?<span[^>]*>([\s\S]*?)<\/span>/i);
@@ -93,7 +168,7 @@ async function buscarDaHomeDooPlay() {
       tituloFinal = decodeURIComponent(url.split('/').pop() || '').replace(/-/g, ' ');
     }
 
-    const capa = normalizarUrl(imgMatch ? imgMatch[1] : '') || 'https://i.8upload.com/image/4784a42f992b726d/icos.png';
+    const capa = extrairCapaDeHtml(card);
     const dublado = /dublado/i.test(url) || /dublado/i.test(tituloFinal);
 
     itens.push({
@@ -119,7 +194,7 @@ async function buscarDaHomeDooPlay() {
         id: url,
         titulo: texto.slice(0, 150),
         audio: /dublado/i.test(url) || /dublado/i.test(texto) ? 'Dublado' : 'Legendado',
-        capa: 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
+        capa: extrairCapaDeHtml(match[2])
       });
     }
   }
@@ -134,12 +209,7 @@ async function buscarDoFeed() {
 
   for (const feedUrl of urlsFeed) {
     try {
-      const res = await fetch(feedUrl, {
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
-        }
-      });
+      const res = await fetch(feedUrl, { headers: HEADERS_PADRAO });
       if (!res.ok) continue;
 
       const xml = await res.text();
@@ -149,17 +219,22 @@ async function buscarDoFeed() {
         const bloco = m[1];
         const titleM = bloco.match(/<title>([\s\S]*?)<\/title>/i);
         const linkM = bloco.match(/<link>([\s\S]*?)<\/link>/i);
-        const imgM = bloco.match(/<img[^>]+src=["']([^"']+)["']/i);
+        const mediaM = bloco.match(/<(?:media:content|media:thumbnail|enclosure)[^>]+url=["']([^"']+)["']/i);
 
         const url = normalizarUrl(linkM ? limparTexto(linkM[1]) : '');
         const titulo = titleM ? limparTexto(titleM[1]) : '';
         if (!url || !titulo) continue;
 
+        let capa = normalizarUrl(mediaM ? mediaM[1] : '');
+        if (!ehImagemValida(capa)) {
+          capa = extrairCapaDeHtml(bloco);
+        }
+
         itens.push({
           id: url,
           titulo: titulo.slice(0, 150),
           audio: /dublado/i.test(url) || /dublado/i.test(titulo) ? 'Dublado' : 'Legendado',
-          capa: normalizarUrl(imgM ? imgM[1] : '') || 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
+          capa
         });
       }
 
@@ -176,29 +251,36 @@ async function buscarDoFeed() {
 }
 
 async function enviarParaDiscord(ep, mencionarEveryone) {
+  const imagemFinal = ehImagemValida(ep.capa) ? ep.capa : CAPA_FALLBACK;
+
+  const embed = {
+    author: {
+      name: 'Mega Animes • Atualização da Noite',
+      icon_url: CAPA_FALLBACK
+    },
+    title: ep.titulo,
+    description: `🎧 **Áudio:** ${ep.audio}\n📺 **Qualidade:** SD / HD / FHD\n📱 Já disponível para assistir no aplicativo **Mega Animes**!`,
+    color: 15010068,
+    footer: {
+      text: 'Mega Animes • Baixe o app: carlin-dark.github.io/Mega-Anime'
+    },
+    timestamp: new Date().toISOString()
+  };
+
+  // Se encontrou a capa real do episódio, exibe em destaque no card (image + thumbnail)
+  if (imagemFinal !== CAPA_FALLBACK) {
+    embed.image = { url: imagemFinal };
+    embed.thumbnail = { url: imagemFinal };
+  } else {
+    embed.thumbnail = { url: CAPA_FALLBACK };
+  }
+
   const payload = {
     username: 'Mega Animes',
-    avatar_url: 'https://i.8upload.com/image/4784a42f992b726d/icos.png',
+    avatar_url: CAPA_FALLBACK,
     content: mencionarEveryone ? '@everyone Novo episódio chegou no **Mega Animes**!' : undefined,
     allowed_mentions: mencionarEveryone ? { parse: ['everyone'] } : { parse: [] },
-    embeds: [
-      {
-        author: {
-          name: 'Mega Animes • Atualização da Noite',
-          icon_url: 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
-        },
-        title: ep.titulo,
-        description: `🎧 **Áudio:** ${ep.audio}\n📺 **Qualidade:** SD / HD / FHD\n📱 Já disponível para assistir no aplicativo **Mega Animes**!`,
-        color: 15010068,
-        thumbnail: {
-          url: ep.capa.startsWith('http') ? ep.capa : 'https://i.8upload.com/image/4784a42f992b726d/icos.png'
-        },
-        footer: {
-          text: 'Mega Animes • Baixe o app: carlin-dark.github.io/Mega-Anime'
-        },
-        timestamp: new Date().toISOString()
-      }
-    ]
+    embeds: [embed]
   };
 
   const res = await fetch(WEBHOOK_URL, {
@@ -235,6 +317,17 @@ async function executar() {
 
   for (let i = 0; i < filaParaEnviar.length; i++) {
     const ep = filaParaEnviar[i];
+
+    // Se a capa ainda não veio válida no card/feed, busca direto na página do episódio
+    if (!ehImagemValida(ep.capa)) {
+      console.log(`Buscando capa real na página do episódio: ${ep.id}`);
+      const capaPagina = await buscarCapaDaPaginaEpisodio(ep.id);
+      if (ehImagemValida(capaPagina)) {
+        ep.capa = capaPagina;
+      }
+    }
+
+    console.log(`Enviando: ${ep.titulo} | Capa: ${ep.capa || 'fallback'}`);
     await enviarParaDiscord(ep, i === 0);
     await new Promise((r) => setTimeout(r, 1500));
   }
